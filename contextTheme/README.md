@@ -1,8 +1,15 @@
-# React + Vite
+make sure at that time of configure the tailwind css for dark theme configuration you have to mention the darkMode built in tailwindcss class for that.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: "class",  /* this is the class for dark mode */
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
