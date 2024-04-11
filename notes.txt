@@ -1,0 +1,7 @@
+(1) in simple core javascript we have to manually update the dom like using document.getElementById().innerHTML=value
+   so this called imprative programming in javascript
+
+(2) instead of in (1 case) if we use react then in react in built algorithm is work so they update the variable value in dom when we change the value of that
+    variable so wherever we have define the that particular variable that many places variable value updated by react fiber algorithm.
+
+(3)
