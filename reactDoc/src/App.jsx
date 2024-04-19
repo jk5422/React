@@ -1,4 +1,5 @@
 import './App.css'
+import TodoList from './TodoList';
 
 function App() {
   const person = {
@@ -24,6 +25,8 @@ function App() {
           <li>Work on the alcohol-fuelled engine</li>
         </ul>
       </div>
+
+      <TodoList />
     </>
   )
 }

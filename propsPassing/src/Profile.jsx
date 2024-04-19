@@ -1,6 +1,12 @@
+import { useEffect } from "react";
 import { getImageUrl } from "./utils";
 
 export default function Profile() {
+
+    useEffect(() => {
+
+    }, [])
+
     return (
         <Card>
             <Avatar
