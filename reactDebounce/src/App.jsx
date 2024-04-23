@@ -7,7 +7,9 @@ function App() {
   return (
     <>
       <div>
-        <DebouncedSearchBar />
+        <DebouncedSearchBar delay={750} callback={(val) => {
+          console.log(val);
+        }} />
       </div>
     </>
   )
