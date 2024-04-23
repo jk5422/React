@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import PageNotFound from './components/PageNotFound'
 import UserList from './components/UserList'
 import UserProfile from './components/UserProfile'
+import GetURLParams from './components/GetURLParams'
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
           <Route path='/service' element={<Service />} />
           <Route path='/user' element={<UserList />} />
           <Route path='/user/:userId' element={<UserProfile />} />
+          <Route path='/geturl' element={<GetURLParams />} />
           <Route path='/*' element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>

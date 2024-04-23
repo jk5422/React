@@ -30,6 +30,9 @@ function Navbar() {
                         {/*<Link to={'/user'}>UserList</Link>*/}
                         <NavLink to={'/user'}>UserList</NavLink>
                     </li>
+                    <li>
+                        <NavLink to={'/geturl'}>GetURLParams</NavLink>
+                    </li>
                 </ul>
             </nav>
         </>
