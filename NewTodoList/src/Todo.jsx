@@ -34,10 +34,10 @@ function Todo() {
         setTodos(newlist);
     }
 
-    const updateTodotxt = (id) => {
+    const updateTodotxt = (id, defaultValue) => {
         const result = JSON.parse(localStorage.getItem('todos'));
         const newlist = result.map(item =>
-            item.id === id ? { ...item, name: updatedtxt, isEditable: false }
+            item.id === id ? { ...item, name: updatedtxt != "" ? updatedtxt : defaultValue, isEditable: false }
                 : item
         )
 
@@ -143,7 +143,7 @@ function Todo() {
                                         <MdDragIndicator />
                                         <input type="checkbox" defaultChecked={item.isCompleted} onClick={() => completedTodo(item.id, item.isCompleted)} />
                                         {
-                                            item.isEditable ? <input type="text" onKeyDown={(e) => e.key === 'Enter' ? updateTodotxt(item.id) : ""} onChange={(e) => setUpdatedtxt(e.target.value)} defaultValue={item.name} /> : <p onClick={() => updateTodo(item.id)}>{item.name}</p>
+                                            item.isEditable ? <input type="text" onKeyDown={(e) => e.key === 'Enter' ? updateTodotxt(item.id, e.target.value) : ""} onChange={(e) => setUpdatedtxt(e.target.value)} defaultValue={item.name} /> : <p onClick={() => updateTodo(item.id)}>{item.name}</p>
                                         }
                                     </div>
                                     : ""
