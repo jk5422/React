@@ -53,15 +53,38 @@
   position: absolute;
 }
 
-.main .todos {
+.main .todos,
+.main .todos .donetodo {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 15px 0px;
 }
 
+.main .todos .donetodo.hidden {
+  display: none;
+}
+
+.main .todos .donetodo.visible {
+  display: flex;
+  animation: slideshow 1s ease-in-out;
+}
+
+@keyframes slideshow {
+
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
+
+}
+
 .main .todos .todolist,
-.main .todos .newtodo {
+.main .todos .newtodo,
+.main .todos .donetodo .todolist {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -73,8 +96,17 @@
   border-radius: 5px;
 }
 
+.main .todos .donetodo .todolist {
+  background-color: greenyellow;
+}
+
+.main .todos .todolist:hover {
+  background-color: rgb(249, 233, 233);
+}
+
 .main .todos .todolist input,
-.main .todos .newtodo input {
+.main .todos .newtodo input,
+.main .todos .donetodo .todolist input {
   padding: 3px;
   border-radius: 5px;
 }
@@ -83,8 +115,11 @@
   cursor: grab;
 }
 
-
-
+.main .todos .todolist.dragging {
+  opacity: 0.5;
+  transform: translateY(-5px);
+  transition: all 0.3s ease-in-out;
+}
 
 
 
@@ -107,6 +142,11 @@
 
 .footer .complete span {
   padding: 0px 5px;
+}
+
+.footer .complete button svg {
+  position: relative;
+  top: 1px;
 }
 
 .footer .complete svg {
