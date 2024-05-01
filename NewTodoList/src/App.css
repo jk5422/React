@@ -112,7 +112,7 @@
 }
 
 .main .todos .todolist svg:hover {
-  cursor: grab;
+  cursor: pointer;
 }
 
 .main .todos .todolist.dragging {
