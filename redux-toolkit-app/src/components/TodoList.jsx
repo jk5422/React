@@ -2,19 +2,27 @@ import styled from 'styled-components'
 import DeleteIcon from "../assets/delete.png";
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTodo, deleteTodo, clearTodos } from '../store/features/TodoSlice.js'
+import { addTodo, deleteTodo, clearTodos, updateTodo } from '../store/features/TodoSlice.js'
 
 function TodoList() {
 
   const dispatch = useDispatch();
   const [newTodo, setNewTodo] = useState("");
   const todos = useSelector((state) => state.todo.todos);
+  const [editId, setEditId] = useState(null);
+  const [editedText, setEditedText] = useState("");
 
   const handleAddTodo = () => {
     if (newTodo) {
       dispatch(addTodo({ id: Date.now(), text: newTodo }))
       setNewTodo("");
     }
+  }
+
+  const handleUpdateTodo = (id) => {
+    dispatch(updateTodo({ id: id, newText: editedText }));
+    setEditId(null);
+    setEditedText("");
   }
 
   return (
@@ -32,7 +40,21 @@ function TodoList() {
       {
         todos.map((todo) => (
           <TodoItem key={todo.id}>
-            <div className="todoText">{todo.text}</div>
+
+            {
+              editId === todo.id ? (
+                <>
+                  <input type="text" value={editedText} onChange={(e) => setEditedText(e.target.value)} />
+                  <button onClick={() => handleUpdateTodo(todo.id)}>Update</button>
+                </>
+              ) : (
+                <>
+                  <div className="todoText">{todo.text}</div>
+                  <div className='editIcon' onClick={() => setEditId(todo.id)}>Edit</div>
+                </>
+              )
+            }
+
             <div className="deleteIcon" onClick={() => dispatch(deleteTodo(todo.id))}>
               <img src={DeleteIcon} alt="delete" />
             </div>
