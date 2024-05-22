@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GlobalInfo } from "../App";
 
 function Login() {
 
@@ -7,17 +8,19 @@ function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState(location.state ? location.state.email : '');
     const [password, setPassword] = useState("");
+    const { users, setUsers } = useContext(GlobalInfo);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const usersList = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (Array.isArray(usersList) && usersList.length > 0) {
-            const resIndex = usersList.findIndex(user => user.email === email && user.password === password);
+        if (Array.isArray(users) && users.length > 0) {
+            const resIndex = users.findIndex(user => user.email === email && user.password === password);
             if (resIndex !== -1) {
-                const updatedUser = { ...usersList[resIndex], isLogin: true };
-                usersList[resIndex] = updatedUser;
-                localStorage.setItem('users', JSON.stringify(usersList));
+                const updatedUser = { ...users[resIndex], isLogin: true };
+                let newuser = [...users];
+                newuser[resIndex] = updatedUser;
+                setUsers(newuser);
                 navigate('/profile', { state: { email: email, isLogin: true } });
             } else {
                 alert("Error..! User Not Found OR Password Incorrect");

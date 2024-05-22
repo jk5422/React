@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { GlobalInfo } from "../App";
 
 function Signup() {
     const navigate = useNavigate();
     const location = useLocation();
     const email = location.state ? location.state.email : '';
+    const { users } = useContext(GlobalInfo);
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -31,10 +34,9 @@ function Signup() {
             alert('Passwords do not match');
             return;
         }
-        const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
         const { confirmPassword, ...newUser } = formData; // discarding the confirmPassword value at that time of save users data
-        existingUsers.push(newUser);
-        localStorage.setItem('users', JSON.stringify(existingUsers));
+        users.push(newUser);
+
         setFormData({
             firstName: '',
             lastName: '',

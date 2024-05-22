@@ -1,17 +1,19 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { GlobalInfo } from "../App";
 
 function Welcome() {
 
     const [email, setEmail] = useState("");
     const navigate = useNavigate();
+    const { users } = useContext(GlobalInfo);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const usersList = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (Array.isArray(usersList) && usersList.length > 0) {
-            const res = usersList.find(user => user.email === email);
+        if (Array.isArray(users) && users.length > 0) {
+            const res = users.find(user => user.email === email);
             if (res) {
                 navigate('/login', { state: { email: email } });
             }

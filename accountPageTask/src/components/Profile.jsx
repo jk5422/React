@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { format } from 'date-fns';
+import { GlobalInfo } from "../App";
 
 function Profile() {
 
     const location = useLocation();
     const navigate = useNavigate();
     const email = location.state ? location.state.email : '';
+    const { users } = useContext(GlobalInfo);
 
     const [userData, setUserData] = useState({
         firstName: '',
@@ -20,10 +22,9 @@ function Profile() {
     });
 
     useEffect(() => {
-        const usersList = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (Array.isArray(usersList) && usersList.length > 0) {
-            const res = usersList.find(user => user.email === email);
+        if (Array.isArray(users) && users.length > 0) {
+            const res = users.find(user => user.email === email);
             if (res) {
                 setUserData(res);
             }
