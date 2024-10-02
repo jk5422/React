@@ -19,9 +19,13 @@ const RupeeInputMask: React.FC = () => {
             inputValue = inputValue.replace(/^0+/, ''); // Remove all leading zeros
         }
 
-        // Allow only numbers and up to two decimal places
+        // Prevent input with more than two zeros after the decimal (e.g., 100.00 is allowed, 100.000 is not)
         const validInput = inputValue.match(/^\d*\.?\d{0,2}$/);
         if (validInput) {
+            const parts = inputValue.split('.');
+            if (parts.length === 2 && parts[1].startsWith('00')) {
+                return; // Don't update the value if there are two zeros after the decimal
+            }
             setValue(inputValue);
         }
     };
