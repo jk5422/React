@@ -12,6 +12,21 @@ const EmailInputMask: React.FC = () => {
         let caretPosition = e.target.selectionStart || 0;
         let wasInserted = false;
 
+        // If the input is empty or only has one character, prevent auto-insertion
+        if (inputValue.length <= 1) {
+            setValue(inputValue);
+            setCursorPosition(caretPosition);
+            return;
+        }
+
+        // Check if the user is inserting '@' right before an existing '@'
+        if (inputValue[caretPosition - 1] === '@' && inputValue[caretPosition] === '@') {
+            // Move cursor one step ahead if '@' is pressed before an existing '@'
+            e.preventDefault();
+            setCursorPosition(caretPosition + 1);
+            return;
+        }
+
         // Automatically insert '@' only if it's missing
         if (!inputValue.includes('@') && inputValue.length > 1) {
             inputValue = inputValue.slice(0, caretPosition) + '@' + inputValue.slice(caretPosition);
@@ -31,12 +46,28 @@ const EmailInputMask: React.FC = () => {
         setCursorPosition(caretPosition);
     };
 
-    // Handle key down events (e.g., arrow keys, spacebar)
+    // Handle key down events (e.g., arrow keys, spacebar, and Ctrl + A)
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const caretPosition = (e.target as HTMLInputElement).selectionStart || 0;
+        const isCtrlA = e.ctrlKey && e.key === 'a'; // Detect Ctrl + A
+        const isBackspaceOrDelete = e.key === 'Backspace' || e.key === 'Delete';
+
+        // Check if Ctrl + A was pressed, and user presses backspace/delete
+        if (isCtrlA) {
+            const inputElement = e.target as HTMLInputElement;
+            inputElement.setSelectionRange(0, value.length); // Select all content
+        }
+
+        // Handle Backspace/Delete after Ctrl + A by clearing the value on first press
+        if (isBackspaceOrDelete && (e.target as HTMLInputElement).selectionStart === 0 && (e.target as HTMLInputElement).selectionEnd === value.length) {
+            e.preventDefault(); // Prevent default backspace behavior
+            setValue(''); // Clear the input
+            setCursorPosition(0);
+            return;
+        }
 
         // Allow the user to manually delete @ and . using backspace
-        if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (isBackspaceOrDelete) {
             if (caretPosition === value.indexOf('@') + 1 || caretPosition === value.indexOf('.') + 1) {
                 e.preventDefault(); // Allow @ and . to be deleted manually
                 setValue(prevValue => prevValue.slice(0, caretPosition - 1) + prevValue.slice(caretPosition));
@@ -76,7 +107,7 @@ const EmailInputMask: React.FC = () => {
                 mask=""                          // No specific mask for the email
                 value={value}                    // Controlled input value
                 onChange={handleInputChange}     // Handle input change and automatic '@' and '.'
-                onKeyDown={handleKeyDown}        // Handle arrow key, spacebar, and backspace behavior
+                onKeyDown={handleKeyDown}        // Handle Ctrl + A, backspace, arrow key, spacebar behavior
                 maskChar={null}                  // No mask character
                 id="email-input"                 // ID for the input element
                 placeholder="Enter your email"   // Placeholder text
