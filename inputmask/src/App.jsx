@@ -2,6 +2,7 @@
 import './App.css'
 import EmailInputMask from './EmailValidation'
 import RupeeInputMask from './Inputmask'
+import PANCardInputMask from './PanCard'
 import ParentComponent from './ParentComponent'
 import PercentageInputMask from './percentage'
 
@@ -15,6 +16,7 @@ function App() {
         <EmailInputMask />
         <PercentageInputMask />
         <ParentComponent />
+        <PANCardInputMask />
       </div>
     </>
   )
