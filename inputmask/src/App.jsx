@@ -3,6 +3,7 @@ import './App.css'
 import DynamicPercentage from './DynamicPercentage'
 import EmailInputMask from './EmailValidation'
 import RupeeInputMask from './Inputmask'
+import MobileNumberInput from './MobileInputmask'
 import PANCardInputMask from './PanCard'
 import ParentComponent from './ParentComponent'
 import PercentageInputMask from './percentage'
@@ -25,8 +26,12 @@ function App() {
         <h1>Pancard mask validation</h1>
 
         <PANCardInputMask />
+
         <h1>Percentage Dynamic mask validation</h1>
         <DynamicPercentage />
+
+        <h1>Mobile mask validation</h1>
+        <MobileNumberInput />
       </div>
     </>
   )
