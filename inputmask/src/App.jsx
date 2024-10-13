@@ -5,15 +5,14 @@ import EmailInputMask from './EmailValidation'
 import RupeeInputMask from './Inputmask'
 import MobileNumberInput from './MobileInputmask'
 import PANCardInputMask from './PanCard'
-import ParentComponent from './ParentComponent'
 import PercentageInputMask from './percentage'
 
 function App() {
 
   return (
     <>
-      <h1>Input mask validation</h1>
       <div>
+
         <h1>Amount mask validation</h1>
         <RupeeInputMask />
         <h1>Email mask validation</h1>
