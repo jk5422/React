@@ -1,0 +1,232 @@
+.date-input {
+    padding: 10px 40px 10px 10px;
+    /* Padding to account for the icon */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 250px;
+    /* Adjust width as needed */
+    font-size: 16px;
+    /* Increase font size for better readability */
+    outline: none;
+    /* Remove outline on focus */
+    transition: border-color 0.3s;
+    /* Smooth transition for border color */
+}
+
+.date-input:focus {
+    border-color: #007bff;
+    /* Change border color on focus */
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    color: #666;
+    /* Icon color */
+    font-size: 20px;
+    /* Increase icon size */
+}
+
+.calendar-container {
+    position: absolute;
+    z-index: 1000;
+    left: 275px;
+    top: 50px;
+    background-color: white;
+    /* Ensure calendar has a white background */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* Softer shadow for depth */
+    border-radius: 8px;
+    /* Round corners of the calendar */
+}
+
+/* Customize the overall calendar */
+.react-calendar {
+    border: none;
+    /* Remove default border */
+    border-radius: 8px;
+    /* Round corners of the calendar */
+}
+
+/* Customize the header of the calendar */
+.react-calendar__navigation {
+    background-color: #007bff;
+    /* Header background color */
+    color: white;
+    /* Header text color */
+    padding: 8px;
+    /* Adjust padding for header */
+    border-radius: 8px 8px 0 0;
+    /* Rounded corners for the header */
+    display: flex;
+    /* Use flex to align items */
+    justify-content: space-between;
+    /* Space between label and arrows */
+    align-items: center;
+    /* Center align items vertically */
+}
+
+.react-calendar__navigation__label {
+    font-size: 1rem;
+    /* Adjust header font size for month/year */
+    font-weight: bold;
+    /* Bold font for emphasis */
+    text-align: center;
+    /* Center the text */
+    flex-grow: 1;
+    /* Allow label to take available space */
+    color: white;
+    /* Ensure label color matches the header */
+}
+
+/* Customize arrows without hover effect */
+.react-calendar__navigation__arrow {
+    color: white;
+    /* Arrow color */
+    font-size: 1.2rem;
+    /* Arrow size */
+    cursor: pointer;
+    /* Show pointer on hover */
+}
+
+/* Remove hover effects from arrows */
+.react-calendar__navigation__arrow:hover {
+    color: white;
+    /* Maintain arrow color on hover */
+    transform: none;
+    /* No scaling effect on hover */
+}
+
+/* Ensure no hover effect on navigation label */
+.react-calendar__navigation__label:hover {
+    color: white;
+    /* Ensure label remains white on hover */
+    text-decoration: none;
+    /* Remove any text decoration */
+}
+
+/* Customize the month view */
+.react-calendar__month-view {
+    background-color: white;
+    /* Ensure the background is white */
+}
+
+/* Customize tiles */
+.react-calendar__tile {
+    color: #333;
+    /* Set tile text color for better contrast */
+    padding: 8px;
+    /* Adjust padding for tiles */
+    border-radius: 5px;
+    /* Round tile corners */
+    transition: background-color 0.2s;
+    /* Smooth background color transition */
+    font-size: 0.9rem;
+    /* Adjust tile font size */
+}
+
+.react-calendar__tile--active {
+    background-color: #007bff;
+    /* Change active tile color */
+    color: white;
+    /* Set active tile text color */
+}
+
+.react-calendar__tile--now {
+    background-color: #e7f3ff;
+    /* Light blue for today */
+}
+
+.react-calendar__tile:hover {
+    background-color: rgba(0, 123, 255, 0.2);
+    /* Light blue on hover */
+}
+
+/* Customize the footer of the calendar */
+.react-calendar__month-view__days {
+    margin: 0;
+    /* Remove margin */
+    padding: 10px 0;
+    /* Add padding */
+}
+
+/* Customize day names */
+.react-calendar__month-view__weekdays {
+    color: #007bff;
+    /* Header color for day names */
+    font-weight: bold;
+    /* Bold font for day names */
+}
+
+/* Add styles for the week days */
+.react-calendar__month-view__weekdays__weekday {
+    color: #007bff;
+    /* Day name color */
+    font-size: 0.85rem;
+    /* Decrease day name font size */
+    text-align: center;
+    /* Center align day names */
+}
+
+
+.date-picker {
+    position: relative;
+    /* Ensure container is relative for absolute positioning of child elements */
+}
+
+.input-container {
+    position: relative;
+    /* Positioning context for the icon */
+}
+
+.date-input {
+    padding: 10px 40px 10px 10px;
+    /* Padding for the icon */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 250px;
+    /* Adjust width as needed */
+    font-size: 16px;
+    /* Increase font size for better readability */
+    outline: none;
+    /* Remove outline on focus */
+    transition: border-color 0.3s;
+    /* Smooth transition for border color */
+}
+
+.date-input:focus {
+    border-color: #007bff;
+    /* Change border color on focus */
+}
+
+.calendar-icon {
+    position: absolute;
+    /* Position the icon inside the input */
+    right: 10px;
+    /* Align the icon to the right */
+    top: 50%;
+    /* Center the icon vertically */
+    transform: translate(-290px, -15px);
+    /* Adjust vertical position */
+    cursor: pointer;
+    /* Change cursor to pointer on hover */
+    color: #666;
+    /* Icon color */
+    font-size: 20px;
+    /* Adjust icon size */
+}
+
+.calendar-container {
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    /* Ensure calendar has a white background */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* Softer shadow for depth */
+    border-radius: 8px;
+    /* Round corners of the calendar */
+}
+
+/* Keep your existing calendar styles below */
