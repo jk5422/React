@@ -26,7 +26,7 @@ const DynamicPercentage: React.FC<PercentageInputMaskProps> = ({
     decimalPoints = 2, // Default value for decimal places
     allowNegative = false // Default to not allow negative values
 }) => {
-    const [value, setValue] = useState<string>(propValue || "");
+    const [value, setValue] = useState<string>(propValue || "0.00");
 
     // Regex pattern to handle dynamic decimal precision and optional negative values
     const decimalPattern = new RegExp(
@@ -53,7 +53,7 @@ const DynamicPercentage: React.FC<PercentageInputMaskProps> = ({
             return;
         }
 
-        // Prepend '0' if input starts with '.'
+        // Prepend '0' if input starts with '.' or ensure at least "0.00"
         if (inputValue.startsWith('.')) {
             inputValue = '0' + inputValue;
         }
@@ -76,20 +76,21 @@ const DynamicPercentage: React.FC<PercentageInputMaskProps> = ({
                     onChange(e); // Trigger onChange prop if available
                 }
             } else if (inputValue === "") {
-                setValue(""); // Allow clearing the input
+                setValue("0.00"); // Reset to "0.00" if input is cleared
                 if (onChange) {
-                    onChange(e);
+                    const modifiedEvent = { ...e, target: { ...e.target, value: "0.00" } };
+                    onChange(modifiedEvent as React.ChangeEvent<HTMLInputElement>);
                 }
             }
         }
     };
 
-    // Handle blur event to replace '-' with '0' if needed
+    // Handle blur event to ensure that empty input or "-" is replaced with "0.00"
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        if (value === "-") {
-            setValue("0"); // Replace '-' with '0' on blur
+        if (value === "" || value === "-" || value === "0.") {
+            setValue("0.00"); // Replace empty, "-" or "0." with "0.00" on blur
             if (onChange) {
-                const modifiedEvent = { ...e, target: { ...e.target, value: "0" } };
+                const modifiedEvent = { ...e, target: { ...e.target, value: "0.00" } };
                 onChange(modifiedEvent as React.ChangeEvent<HTMLInputElement>);
             }
         }
