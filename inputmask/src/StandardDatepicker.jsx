@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
-import "./standardDatepicker.css";
+import "./styles.css";
 
-export default function App() {
+export default function StandardDatePicker() {
     const [date, setDate] = useState("");
     const [datePickerDate, setDatePickerDate] = useState("");
     const inputRef = useRef(null);
@@ -12,8 +12,8 @@ export default function App() {
 
     const handleInputChange = (e) => {
         const cursorPosBeforeChange = inputRef.current.selectionStart; // Get cursor position before change
-        let value = e.target.value.replace(/[^0-9/]/g, ""); // Allow only numbers and slashes
-        const segments = value.split("/").filter(Boolean);
+        let value = e.target.value?.replace(/[^0-9/]/g, ""); // Allow only numbers and slashes
+        const segments = value?.split("/").filter(Boolean);
 
         let day = segments[0] || "";
         let month = segments[1] || "";
@@ -32,7 +32,10 @@ export default function App() {
         // Validate day (dd)
         if (day.length === 2) {
             if (month.length === 2) {
-                const lastDateOfMonth = lastday(currentYear, month - 1); // Last date based on selected month
+                const lastDateOfMonth =
+                    !month && !year
+                        ? lastday(currentYear, month - 1)
+                        : lastday(year, month - 1); // Last date based on selected month & year
                 day = Math.min(Number(day), lastDateOfMonth)
                     .toString()
                     .padStart(2, "0");
@@ -63,7 +66,11 @@ export default function App() {
 
         // Update the input and restore cursor position
         setDate(newValue);
-        const newCursorPos = calculateCursorPosition(cursorPosBeforeChange, newValue);
+        setDatePickerDate(convertToInputDateFormat(newValue));
+        const newCursorPos = calculateCursorPosition(
+            cursorPosBeforeChange,
+            newValue
+        );
 
         setTimeout(() => {
             inputRef.current.setSelectionRange(newCursorPos, newCursorPos);
@@ -91,18 +98,61 @@ export default function App() {
     };
 
     const handleKeyPress = (e) => {
+        const cursorPosition = inputRef.current.selectionStart; // Get cursor position before change
+
         if (e.key === "Enter") {
             const segments = date.split("/");
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth() + 1;
             const currentYear = currentDate.getFullYear();
+            const nextYear = currentYear + 1;
 
             // If only day is entered, append the current month and year
-            if (segments[0] && segments[0].length === 2 && !segments[1]) {
-                const newDate = `${segments[0]}/${String(currentMonth).padStart(2, "0")}/${currentYear}`;
+            if (segments[0] && segments[0] > 0 && !segments[1]) {
+                // if (segments[0] && segments[0].length === 2 && !segments[1]) {
+                const newDate = `${segments[0]?.toString().padStart(2, "0")}/${String(
+                    currentMonth
+                ).padStart(2, "0")}/${currentYear}`;
                 setDate(newDate);
                 setTimeout(() => {
                     inputRef.current.value = newDate;
+                }, 0);
+            }
+
+            if (segments[0] && segments[1]) {
+                const day = segments[0];
+                const month = segments[1];
+                let year = segments[2] || ""; // Extract the year segment if present
+
+                // Check if the year segment is 2 digits or less and add the current century
+                if (year && (year.length === 2 || year.length === 1)) {
+                    // if (year.length === 2 || year.length === 1) {
+                    year = `${currentYear.toString().slice(0, 2)}${year.padStart(
+                        2,
+                        "0"
+                    )}`;
+                } else if (
+                    !year ||
+                    (year && cursorPosition >= 3 && cursorPosition <= 6)
+                ) {
+                    // decide year based on the month
+                    if (parseInt(month) >= 4) {
+                        year = currentYear.toString();
+                    } else {
+                        year = nextYear.toString();
+                    }
+                }
+
+                // Construct the new date
+                const newDate = `${day.toString().padStart(2, "0")}/${month
+                    ?.toString()
+                    .padStart(2, "0")}/${year}`;
+                setDate(newDate);
+                setDatePickerDate(convertToInputDateFormat(newDate));
+
+                // Move cursor to the end of the input
+                setTimeout(() => {
+                    inputRef.current.setSelectionRange(newDate.length, newDate.length);
                 }, 0);
             }
         }
@@ -120,7 +170,11 @@ export default function App() {
         }
 
         // Clear input when Backspace or Delete is pressed after Ctrl + A
-        if ((e.key === "Backspace" || e.key === "Delete") && inputRef.current.selectionStart === 0 && inputRef.current.selectionEnd === date.length) {
+        if (
+            (e.key === "Backspace" || e.key === "Delete") &&
+            inputRef.current.selectionStart === 0 &&
+            inputRef.current.selectionEnd === date.length
+        ) {
             e.preventDefault(); // Prevent default behavior
             setDate(""); // Clear entire date
             setTimeout(() => {
@@ -152,7 +206,9 @@ export default function App() {
                 if (segments[0] && segments[0].length > 0) {
                     // Remove one character from dd segment
                     const newDay = segments[0].slice(0, -1); // Remove last character of dd
-                    setDate(newDay + "/" + (segments[1] || "") + "/" + (segments[2] || "")); // Update date while keeping mm/yyyy
+                    setDate(
+                        newDay + "/" + (segments[1] || "") + "/" + (segments[2] || "")
+                    ); // Update date while keeping mm/yyyy
                     setTimeout(() => {
                         inputRef.current.setSelectionRange(newDay.length, newDay.length); // Move cursor to the end of dd
                     }, 0);
@@ -168,7 +224,10 @@ export default function App() {
                 e.preventDefault(); // Prevent default backspace behavior
                 setDate(segments[0]); // Set date to only the day part
                 setTimeout(() => {
-                    inputRef.current.setSelectionRange(segments[0].length, segments[0].length); // Move cursor to the end of dd
+                    inputRef.current.setSelectionRange(
+                        segments[0].length,
+                        segments[0].length
+                    ); // Move cursor to the end of dd
                 }, 0);
                 return; // Exit the function
             } else if (cursorPosition === 6) {
@@ -186,7 +245,16 @@ export default function App() {
                     const newYear = segments[2].slice(0, -1); // Remove last digit of year
                     setDate(segments[0] + "/" + (segments[1] || "") + "/" + newYear); // Update date while keeping dd/mm
                     setTimeout(() => {
-                        inputRef.current.setSelectionRange(segments[0].length + (segments[1] ? segments[1].length : 0) + 2 + newYear.length, segments[0].length + (segments[1] ? segments[1].length : 0) + 2 + newYear.length); // Move cursor to the end of year
+                        inputRef.current.setSelectionRange(
+                            segments[0].length +
+                            (segments[1] ? segments[1].length : 0) +
+                            2 +
+                            newYear.length,
+                            segments[0].length +
+                            (segments[1] ? segments[1].length : 0) +
+                            2 +
+                            newYear.length
+                        ); // Move cursor to the end of year
                     }, 0);
                 }
             }
@@ -199,7 +267,9 @@ export default function App() {
                 if (segments[0] && segments[0].length > 0) {
                     // Remove one character from dd segment
                     const newDay = segments[0].slice(1); // Remove first character of dd
-                    setDate(newDay + "/" + (segments[1] || "") + "/" + (segments[2] || "")); // Update date while keeping mm/yyyy
+                    setDate(
+                        newDay + "/" + (segments[1] || "") + "/" + (segments[2] || "")
+                    ); // Update date while keeping mm/yyyy
                     setTimeout(() => {
                         inputRef.current.setSelectionRange(0, 0); // Move cursor to the start of dd
                     }, 0);
@@ -222,7 +292,10 @@ export default function App() {
                     const newMonth = segments[1].slice(0, -1); // Remove last digit of month
                     setDate(segments[0] + "/" + newMonth + "/" + (segments[2] || "")); // Update date while keeping dd/yyyy
                     setTimeout(() => {
-                        inputRef.current.setSelectionRange(3 + newMonth.length, 3 + newMonth.length); // Move cursor to the end of mm
+                        inputRef.current.setSelectionRange(
+                            3 + newMonth.length,
+                            3 + newMonth.length
+                        ); // Move cursor to the end of mm
                     }, 0);
                 }
                 return; // Exit the function
@@ -249,7 +322,16 @@ export default function App() {
                 const newYear = segments[2].slice(0, -1); // Remove last digit of year
                 setDate(segments[0] + "/" + (segments[1] || "") + "/" + newYear); // Update date while keeping dd/mm
                 setTimeout(() => {
-                    inputRef.current.setSelectionRange(segments[0].length + (segments[1] ? segments[1].length : 0) + 2 + newYear.length, segments[0].length + (segments[1] ? segments[1].length : 0) + 2 + newYear.length); // Move cursor to the end of year
+                    inputRef.current.setSelectionRange(
+                        segments[0].length +
+                        (segments[1] ? segments[1].length : 0) +
+                        2 +
+                        newYear.length,
+                        segments[0].length +
+                        (segments[1] ? segments[1].length : 0) +
+                        2 +
+                        newYear.length
+                    ); // Move cursor to the end of year
                 }, 0);
             }
         }
@@ -267,13 +349,55 @@ export default function App() {
         }
     };
 
-
-
     const handleFocus = (e) => {
-        const cursorPosition = e.target.selectionStart;
         setTimeout(() => {
             inputRef.current.setSelectionRange(0, date.length); // Select the whole date
         }, 0);
+    };
+
+    // Function to convert "DD/MM/YYYY" back to "YYYY-MM-DD"
+    const convertToInputDateFormat = (dateStr) => {
+        // const [day, month, year] = dateStr?.split("/");
+        const [day, month, year] = dateStr.split(/[-\/]/);
+        return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
+    };
+
+    const handleBlur = (e) => {
+        const segments = e.target.value?.split("/");
+        let dd = segments[0] || "";
+        let mm = segments[1] || "";
+        let year = segments[2] || "";
+
+        if (e.target.value !== "" && e.target.value.length === 10) {
+            setDatePickerDate(convertToInputDateFormat(e.target.value));
+        }
+
+        if (e.target.value?.length < 10) {
+            // for dd segment if 0 or null
+            if (dd === "" || dd === 0) {
+                dd += "/";
+            } else {
+                dd = dd.toString().padStart(2, "0") + "/";
+            }
+
+            // for mm segment if 0 or null
+            if (mm === "" || mm === 0) {
+                mm += "/";
+            } else {
+                mm = mm.toString().padStart(2, "0") + "/";
+            }
+
+            if (
+                (dd === "" && mm === "" && year === "") ||
+                (dd === "/" && mm === "/")
+            ) {
+                setDate("");
+                return;
+            }
+            // Build the final value
+            let newValue = `${dd}${mm}${year}`;
+            setDate(newValue);
+        }
     };
 
     return (
@@ -287,20 +411,23 @@ export default function App() {
                 onKeyPress={handleKeyPress}
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
+                onBlur={(e) => handleBlur(e)}
                 maxLength={10}
                 ref={inputRef}
             />
 
             <input
                 type="date"
-                className="calendar"
+                className="calendar-icon"
                 value={datePickerDate}
                 onChange={(e) => {
                     if (e.target.value !== "") {
-                        const selectedDate = new Date(e.target.value).toLocaleDateString("en-GB");
+                        const selectedDate = new Date(e.target.value).toLocaleDateString(
+                            "en-GB"
+                        );
                         setDate(selectedDate);
                         setDatePickerDate(e.target.value);
-                    } else {
+                    } else if (e.target.value === "") {
                         setDate("");
                         setDatePickerDate("");
                     }
