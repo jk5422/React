@@ -4,6 +4,7 @@ import DynamicPercentage from './DynamicPercentage'
 import EmailInputMask from './EmailValidation'
 import AdvancedCalendar from './InputDatePicker'
 import RupeeInputMask from './Inputmask'
+import InputMaskDatePicker from './InputmaskDatePicker'
 import MobileNumberInput from './MobileInputmask'
 // import PANCardInputMask from './PanCard'
 import PercentageInputMask from './percentage'
@@ -14,6 +15,9 @@ function App() {
   return (
     <>
       <div>
+        <h1>Amount mask validation</h1>
+        <InputMaskDatePicker />
+
         <h1>Amount mask validation</h1>
         <StandardDatePicker />
 

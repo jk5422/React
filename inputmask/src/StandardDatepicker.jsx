@@ -418,7 +418,7 @@ export default function StandardDatePicker() {
 
             <input
                 type="date"
-                className="calendar-icon"
+                className="calendar"
                 value={datePickerDate}
                 onChange={(e) => {
                     if (e.target.value !== "") {
