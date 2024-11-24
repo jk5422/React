@@ -5,6 +5,8 @@ import "./styles.css";
 export default function InputMaskDatePicker() {
     const [date, setDate] = useState("");
     const [datePickerDate, setDatePickerDate] = useState("");
+    const [cursorPosition, setCursorPosition] = useState(null); // Track cursor position
+    const [activeSegment, setActiveSegment] = useState("day"); // Track active segment
 
     const lastday = (y, m) => new Date(y, m + 1, 0).getDate();
 
@@ -48,14 +50,21 @@ export default function InputMaskDatePicker() {
         if (day.length === 2 && !month) newValue += "/";
         if (month.length === 2 && !year) newValue += "/";
 
-        setDate(newValue);
-
-        // Restore the cursor position if not a full valid date
-        if (!newValue.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            setTimeout(() => {
-                inputElement.setSelectionRange(cursorPosBeforeChange, cursorPosBeforeChange);
-            }, 0);
+        // Update only if the new value is different to avoid unnecessary re-renders
+        if (newValue !== date) {
+            setDate(newValue);
         }
+
+        // Restore the cursor position and keep track of the active segment
+        if (cursorPosBeforeChange <= 2) {
+            setActiveSegment("day");
+        } else if (cursorPosBeforeChange <= 5) {
+            setActiveSegment("month");
+        } else {
+            setActiveSegment("year");
+        }
+
+        setCursorPosition(cursorPosBeforeChange);
     };
 
     const handleKeyDown = (e) => {
@@ -101,6 +110,16 @@ export default function InputMaskDatePicker() {
         }
     };
 
+    const handleFocus = () => {
+        const inputElement = document.getElementById("date-input");
+        // Restore the cursor position on focus
+        if (cursorPosition !== null) {
+            setTimeout(() => {
+                inputElement.setSelectionRange(cursorPosition, cursorPosition);
+            }, 0);
+        }
+    };
+
     return (
         <div className="date-picker">
             <InputMask
@@ -111,6 +130,7 @@ export default function InputMaskDatePicker() {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
+                onFocus={handleFocus} // Handle focus to restore cursor
             />
 
             <input
@@ -126,6 +146,3 @@ export default function InputMaskDatePicker() {
         </div>
     );
 }
-
-
-{/*https://chatgpt.com/share/67153fa7-ed98-8011-83c1-ed4a36d24bec --> svg use in typescript*/ }
