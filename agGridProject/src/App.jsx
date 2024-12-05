@@ -18,6 +18,7 @@ const App = () => {
           { otherName: "Other Item 1A", rate: 2, quantity: 5, amount: 10 },
           { otherName: "Other Item 1B", rate: 4, quantity: 2, amount: 8 },
         ],
+        totalOtherAmount: 18, // Precomputed
       },
       {
         itemName: "Item 2",
@@ -29,6 +30,7 @@ const App = () => {
           { otherName: "Other Item 2A", rate: 3, quantity: 3, amount: 9 },
           { otherName: "Other Item 2B", rate: 5, quantity: 1, amount: 5 },
         ],
+        totalOtherAmount: 14, // Precomputed
       },
     ],
   });
@@ -36,45 +38,6 @@ const App = () => {
   const [lstitem, setLstitem] = useState(addEdit.lstitem || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(0);
   const [lstother, setLstother] = useState(lstitem[0]?.lstother || []);
-
-
-  // Calculation functions
-  const calculateNetWt = (data, outputFiled = 'netWt') => {
-    const {
-      grossWt = 0,
-      lessWt = 0,
-    } = data || {};
-    return { [outputFiled]: grossWt - lessWt }
-  };
-  const calculateAmount = (data, outputFiled = 'amount') => {
-    const {
-      rate = 0,
-      quantity = 0,
-    } = data || {};
-
-    return { [outputFiled]: rate * quantity }
-  };
-
-
-  // Utility to calculate dependent fields dynamically
-  // Dependency map referencing functions
-  const dependencyMap = {
-    grossWt: (data) => calculateNetWt(data, "netWt"), // Calls calculateNetWt function
-    lessWt: (data) => calculateNetWt(data, "netWt"),  // Same function handles grossWt and lessWt
-    rate: (data) => calculateAmount(data, 'amount'),   // Calls calculateAmount function
-    quantity: (data) => calculateAmount(data, 'amount'), // Same function handles rate and quantity
-  };
-
-
-  // Dynamic calculation function
-  const calculateDependenciesDynamic = (data, field, value) => {
-    const updatedData = { ...data, [field]: value };
-    if (dependencyMap[field]) {
-      return { ...updatedData, ...dependencyMap[field](updatedData) };
-    }
-    return updatedData;
-  };
-
 
   // Totals row data for first grid
   const pinnedBottomRowDataFirstGrid = useMemo(() => {
@@ -84,10 +47,20 @@ const App = () => {
         grossWt: lstitem.reduce((sum, row) => sum + (row.grossWt || 0), 0),
         lessWt: lstitem.reduce((sum, row) => sum + (row.lessWt || 0), 0),
         netWt: lstitem.reduce((sum, row) => sum + (row.netWt || 0), 0),
+        totalOtherAmount: lstitem.reduce(
+          (sum, row) => sum + (row.totalOtherAmount || 0),
+          0
+        ),
+        grandTotal: lstitem.reduce(
+          (sum, row) =>
+            sum + ((row.netWt || 0) - (row.totalOtherAmount || 0)),
+          0
+        ),
         editable: false,
       },
     ];
   }, [lstitem]);
+
 
   // Totals row data for second grid
   const pinnedBottomRowDataSecondGrid = useMemo(() => {
@@ -101,59 +74,41 @@ const App = () => {
 
   // First grid column definitions
   const firstGridColumnDefs = [
-    { field: "itemName", editable: (params) => !(params.node.rowPinned), suppressAggregation: true },
-    { field: "grossWt", editable: (params) => !(params.node.rowPinned), aggFunc: "sum" },
-    { field: "lessWt", editable: (params) => !(params.node.rowPinned), aggFunc: "sum" },
-    { field: "netWt", editable: false, aggFunc: "sum" },
+    { field: "itemName", editable: (params) => !(params.node.rowPinned) },
+    { field: "grossWt", editable: (params) => !(params.node.rowPinned) },
+    { field: "lessWt", editable: (params) => !(params.node.rowPinned) },
+    { field: "netWt", editable: false },
+    {
+      field: "totalOtherAmount",
+      headerName: "Total Other Amount",
+      editable: false,
+    },
+    {
+      field: "grandTotal",
+      headerName: "Grand Total",
+      editable: false,
+      valueGetter: (params) =>
+        params.node.rowPinned
+          ? null
+          : (params.data.netWt || 0) - (params.data.totalOtherAmount || 0),
+    },
     {
       field: "isOther",
       cellRenderer: "agCheckboxCellRenderer",
       editable: true,
-      suppressAggregation: true,
-      valueGetter: (params) => {
-        if (params.node.rowPinned) return null; // Suppress checkbox value in totals row
-        return params.data?.isOther || false;
-      },
-      cellEditorSelector: (params) => {
-        if (params.node.rowPinned) return null; // No editor for pinned rows
-        return { component: "agCheckboxCellRenderer" };
-      },
-      onCellClicked: (params) => {
-        if (!params.node.rowPinned) {
-          params.api.startEditingCell({
-            rowIndex: params.rowIndex,
-            colKey: "isOther",
-          });
-        }
-      },
-      cellRendererParams: {
-        checkbox: true, // Ensure checkbox renders correctly
-      },
-      cellRendererSelector: (params) => {
-        if (params.node.rowPinned) return null; // No renderer for pinned rows
-        return { component: "agCheckboxCellRenderer" };
-      },
-      cellStyle: (params) => {
-        // Apply styles to hide checkbox in totals row
-        return params.node.rowPinned ? { display: "none" } : null;
-      },
+      valueGetter: (params) =>
+        params.node.rowPinned ? null : params.data?.isOther || false,
+      cellStyle: (params) => (params.node.rowPinned ? { display: "none" } : null),
     },
   ];
 
   // Second grid column definitions
   const secondGridColumnDefs = [
-    { field: "otherName", editable: (params) => !(params.node.rowPinned), suppressAggregation: true },
-    { field: "rate", editable: (params) => !(params.node.rowPinned), suppressAggregation: true },
-    { field: "quantity", editable: (params) => !(params.node.rowPinned), suppressAggregation: true },
-    { field: "amount", editable: false, aggFunc: "sum" },
+    { field: "otherName", editable: (params) => !(params.node.rowPinned) },
+    { field: "rate", editable: (params) => !(params.node.rowPinned) },
+    { field: "quantity", editable: (params) => !(params.node.rowPinned) },
+    { field: "amount", editable: false },
   ];
-
-  const isRowEditable = (params) => {
-    if (params.node.rowPinned) {
-      return false; // Disable editing for totals row explicitly
-    }
-    return true; // Allow editing for other rows
-  };
 
   // Handle row selection in the first grid
   const handleRowSelection = (rowIndex) => {
@@ -165,8 +120,6 @@ const App = () => {
   const handleCellFocused = (event) => {
     const { rowIndex } = event;
     handleRowSelection(rowIndex);
-    setLstother(lstitem[rowIndex]?.lstother || []);
-
   };
 
   // Handle row click in the first grid
@@ -176,52 +129,60 @@ const App = () => {
 
   // Handle changes in the first grid
   const handleFirstGridChange = (event) => {
-    console.log(event, "handleFirstGridChange")
     const { rowIndex, colDef, newValue, data } = event;
     const validatedValue = newValue; // Add validation logic if needed
-    const updatedRow = calculateDependenciesDynamic(data, colDef.field, validatedValue);
+
+    // Update the modified row
+    const updatedRow = { ...data, [colDef.field]: validatedValue };
+
+    // Recalculate totalOtherAmount if lstother changes
+    if (colDef.field === "lstother") {
+      updatedRow.totalOtherAmount = (updatedRow.lstother || []).reduce(
+        (sum, other) => sum + (other.amount || 0),
+        0
+      );
+    }
 
     const updatedLstitem = [...lstitem];
     updatedLstitem[rowIndex] = updatedRow;
     setLstitem(updatedLstitem);
   };
 
-  // Handle changes in the second grid
   const handleSecondGridChange = (event) => {
     const { rowIndex, colDef, newValue, data } = event;
-    const validatedValue = newValue; // Add validation logic if needed
-    const updatedRow = calculateDependenciesDynamic(data, colDef.field, validatedValue);
 
+    // Update the changed field in lstother
+    const updatedRow = { ...data, [colDef.field]: newValue };
+
+    // Recalculate the amount field if rate or quantity changes
+    if (colDef.field === "rate" || colDef.field === "quantity") {
+      const rate = parseFloat(updatedRow.rate || 0);
+      const quantity = parseFloat(updatedRow.quantity || 0);
+      updatedRow.amount = rate * quantity; // Calculate amount
+    }
+
+    // Update the lstother array
     const updatedLstother = [...lstother];
     updatedLstother[rowIndex] = updatedRow;
     setLstother(updatedLstother);
 
-    // Update lstitem for the selected row
+    // Update the lstitem array
     const updatedLstitem = [...lstitem];
-    updatedLstitem[selectedRowIndex].lstother = updatedLstother;
+    const selectedRow = updatedLstitem[selectedRowIndex];
+    selectedRow.lstother = updatedLstother;
+
+    // Recalculate totalOtherAmount for the selected row
+    selectedRow.totalOtherAmount = updatedLstother.reduce(
+      (sum, row) => sum + (row.amount || 0),
+      0
+    );
+
+    // Recalculate grandTotal for the selected row
+    selectedRow.grandTotal =
+      (selectedRow.netWt || 0) - (selectedRow.totalOtherAmount || 0);
+
     setLstitem(updatedLstitem);
   };
-
-
-  // Handle form submission
-  const handleSubmit = () => {
-    const updatedAddEdit = {
-      ...addEdit,
-      lstitem,
-    };
-    console.log("Form data to be submitted:", updatedAddEdit);
-
-    // Example API call:
-    // fetch('/api/save', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(updatedAddEdit),
-    // })
-    //   .then(response => response.json())
-    //   .then(data => console.log("Data saved successfully!", data))
-    //   .catch(error => console.error("Error saving data:", error));
-  };
-
 
 
 
@@ -236,11 +197,7 @@ const App = () => {
         onRowClicked={handleRowClicked}
         onCellValueChanged={handleFirstGridChange}
         pinnedBottomRowData={pinnedBottomRowDataFirstGrid}
-        enableCellTextSelection={true}
-        isRowEditable={isRowEditable}
-        suppressAggFuncInHeader={true}
         domLayout="autoHeight"
-
       />
 
       <h3>Second Grid (lstother)</h3>
@@ -248,14 +205,10 @@ const App = () => {
         rowData={lstother}
         columnDefs={secondGridColumnDefs}
         singleClickEdit={true}
-        domLayout="autoHeight"
         onCellValueChanged={handleSecondGridChange}
         pinnedBottomRowData={pinnedBottomRowDataSecondGrid}
-        enableCellTextSelection={true}
-        isRowEditable={isRowEditable}
+        domLayout="autoHeight"
       />
-
-      <button onClick={handleSubmit}>Submit</button>
     </div>
   );
 };
