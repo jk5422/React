@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const CountdownTimer = ({ initialMinutes }) => {
     const [time, setTime] = useState(initialMinutes * 60); // Convert minutes to seconds
     const [isActive, setIsActive] = useState(true);
-
+    console.log("countdown component render")
     useEffect(() => {
         // Load the timer from local storage if it exists
         const savedEndTime = localStorage.getItem('countdownEndTime');
